@@ -15,7 +15,7 @@ exports.createBook =  (req, res, next) => {
 // Met à jour le livre avec l'id fourni
 
 exports.modifyBook =  (req, res, next) => {
-    Book.updateOne({ id: req.params.id }, { ...req.body, id: req.params.id})
+    Book.updateOne({ _id: req.params.id }, { ...req.body, id: req.params.id})
      .then(() => res.status(200).json({ message: 'livre modifié !'}))
      .catch(error => res.status(400).json({ error }));
 };
@@ -23,7 +23,7 @@ exports.modifyBook =  (req, res, next) => {
 //Supprime le livre avec l'_id fourni
 
 exports.deleteBook =  (req, res, next) => {
-    Book.deleteOne({ id: req.params.id })
+    Book.deleteOne({ _id: req.params.id })
      .then(() => res.status(200).json({ message: 'livre supprimé !'}))
      .catch(error => res.status(400).json({ error })); 
 };
@@ -31,7 +31,7 @@ exports.deleteBook =  (req, res, next) => {
 // Renvoie le livre avec l’_id fourni
 
 exports.getOneBook =  (req, res, next) => {
-    Book.findOne({ id: req.params.id })
+    Book.findOne({ _id: req.params.id })
      .then(book => res.status(200).json(book))
      .catch(error => res.status(404).json({ error }));
 };
