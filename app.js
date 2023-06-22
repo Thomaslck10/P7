@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const bookRoutes = require('./routes/book');
 const userRoutes = require('./routes/user');
 
+const path = require('path');
+
 mongoose.connect('mongodb+srv://thomasluck10:totodu10@cluster0.mbtqffb.mongodb.net/',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
@@ -23,6 +25,8 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.json());
+
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/api/books', bookRoutes);
 app.use('/api/auth', userRoutes);
