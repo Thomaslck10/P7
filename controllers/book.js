@@ -30,7 +30,7 @@ exports.modifyBook = (req, res, next) => {
     Book.findOne({_id: req.params.id})
         .then((book) => {
             if (book.userId != req.auth.userId) {
-                res.status(401).json({ message : 'Not authorized'});
+                res.status(403).json({message: 'unauthorized request'});
             } else {
                 Book.updateOne({ _id: req.params.id}, { ...bookObject, _id: req.params.id})
                 .then(() => res.status(200).json({message : 'Livre modifié!'}))
@@ -48,7 +48,7 @@ exports.deleteBook = (req, res, next) => {
     Book.findOne({ _id: req.params.id})
         .then(book => {
             if (book.userId != req.auth.userId) {
-                res.status(401).json({message: 'Not authorized'});
+                res.status(403).json({message: 'unauthorized request'});
             } else {
                 const filename = book.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
@@ -79,12 +79,45 @@ exports.getAllBooks =  (req, res, next) => {
      .catch(error => res.status(400).json({ error }));
 };
 
-//Renvoie un tableau des 3 livres de la base de données ayant la meilleure note moyenne
+// Renvoie un tableau des 3 livres de la base de données ayant la meilleure note moyenne
 
 exports.getBestBooks =  (req, res, next) => {
     Book.find()
-       .sort({averageRating: -1})
-       .limit(3)    
+     .sort({averageRating: -1})
+     .limit(3)    
      .then(bestBooks => res.status(200).json(bestBooks))
      .catch(error => res.status(400).json({ error }));
 };
+
+// Définit la note pour le user ID fourni
+
+exports.rateBook = (req, res, next) => {
+    const newRating = {
+      userId: req.body.userId,
+      grade: req.body.rating,
+    };
+    Book.updateOne({ _id: req.params.id }, { $push: { ratings: newRating } })
+      .then(() => {
+        Book.findOne({ _id: req.params.id }).then((book) => {
+          let totalRatings = 0;
+          let averageRating = 0;
+          for (let i = 0; i < book.ratings.length; i++) {
+            totalRatings += book.ratings[i].grade;
+          }
+          averageRating = totalRatings / book.ratings.length;
+          Book.updateOne(
+            { _id: req.params.id },
+            { $set: { averageRating: averageRating } }
+          ).then(() => {
+            Book.findOne({ _id: req.params.id })
+              .then((book) => {
+                res.status(200).json(book);
+              })
+              .catch((error) => res.status(404).json({ error }));
+          });
+        });
+      })
+      .catch((error) => {
+        res.status(400).json({ error });
+      });
+  };
