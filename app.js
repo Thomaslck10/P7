@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 // Serveur
 
 const express = require('express');
@@ -22,9 +24,14 @@ const authLimiter = rateLimit({
 
 // Base de données
 
+
+
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb+srv://thomasluck10:totodu10@cluster0.mbtqffb.mongodb.net/',
+const IdentifiantMONGODB = process.env.CONNECTION_MONGODB;
+console.log(process.env.CONNECTION_MONGODB);
+
+mongoose.connect(IdentifiantMONGODB,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
