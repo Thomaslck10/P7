@@ -10,8 +10,7 @@ const app = express();
 
 const mongoSanitize = require('express-mongo-sanitize');
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(mongoSanitize());
 
 // rate-limiter
 
@@ -22,9 +21,9 @@ const authLimiter = rateLimit({
   max: 50,
 });
 
+app.use(authLimiter);
+
 // Base de données
-
-
 
 const mongoose = require('mongoose');
 
